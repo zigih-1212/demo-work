@@ -55,3 +55,14 @@ def run_robot_job(session, job_id: str, simulate_delay: float = 0.5):
 
     session.commit()
     return job
+
+
+def make_sync_session():
+    """Create a synchronous session for Celery workers (psycopg3 supports sync)."""
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    from app.core.config import get_settings
+
+    engine = create_engine(get_settings().database_url, pool_pre_ping=True)
+    return sessionmaker(engine, expire_on_commit=False)()

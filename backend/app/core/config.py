@@ -1,9 +1,19 @@
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+def _to_bool(value: str | bool) -> bool:
+    """Разбор булевого значения из окружения: 1/true/yes/on → True."""
+    if isinstance(value, bool):
+        return value
+    return str(value).strip().lower() in ("1", "true", "yes", "on")
+
+
 class Settings(BaseSettings):
+    """Настройки приложения, заполняемые из переменных окружения ORTHODENT_*."""
+
     model_config = SettingsConfigDict(
         env_prefix="ORTHODENT_", env_file=".env", extra="ignore"
     )
@@ -11,7 +21,7 @@ class Settings(BaseSettings):
     app_name: str = "OrthoDent API"
     debug: bool = False
 
-    # Async URL for the API (psycopg3), sync URL for Celery workers.
+    # Async URL для API (psycopg3), sync URL для воркеров Celery.
     database_url: str = (
         "postgresql+psycopg://orthodent:orthodent@localhost:5432/orthodent"
     )
@@ -25,9 +35,14 @@ class Settings(BaseSettings):
     algorithm: str = "HS256"
 
     upload_dir: str = "uploads"
-    max_scan_bytes: int = 50 * 1024 * 1024  # 50 MB STL limit
+    max_scan_bytes: int = 50 * 1024 * 1024  # лимит STL: 50 МБ
 
-    cors_origins: list[str] = ["http://localhost:5173"]
+    cors_origins: list[str] = ["http://localhost:3000", "http://localhost:5173"]
+
+    @field_validator("debug", mode="before")
+    @classmethod
+    def _parse_debug(cls, value):
+        return _to_bool(value)
 
 
 @lru_cache

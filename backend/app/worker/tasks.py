@@ -1,45 +1,59 @@
-"""Worker task definitions for async operations.
+"""Celery worker tasks for background processing.
 
-This module defines Celery tasks that run on worker nodes.
-For testing/demo purposes, we keep stub implementations that demonstrate
-the task structure and integration points.
+The API falls back to synchronous execution when the broker is unreachable
+(see app.services.queue), so these tasks are the production path only.
 """
 
 from app.worker.celery_app import celery_app
 
 
-@celery_app.task(bind=True, max_retries=3, autoretry_for=(Exception,))
+@celery_app.task(
+    bind=True, max_retries=3, autoretry_for=(Exception,), default_retry_delay=30
+)
 def process_scan_task(self, scan_id: str) -> str:
     """
-    Task to process a patient scan (STL file).
-
-    This task will be executed by Celery workers using Redis as broker.
-    The real implementation would use the sync version of processing logic.
+    Parse an uploaded STL, compute mesh metrics, mark the scan ready.
 
     Args:
         self: Celery task context for retrying
         scan_id: ID of the scan to process
 
     Returns:
-        str: Final status ("ready", "failed")
+        str: Final scan status ("ready" or "failed")
     """
-    # Placeholder - in production this would call the service layer
-    return "pending"
+    from app.services.scan_processing import make_sync_session, process_scan
+
+    session = make_sync_session()
+    try:
+        scan = process_scan(session, scan_id)
+        return scan.status
+    except Exception as exc:
+        raise self.retry(exc=exc)
+    finally:
+        session.close()
 
 
-@celery_app.task(bind=True, max_retries=3, autoretry_for=(Exception,))
+@celery_app.task(
+    bind=True, max_retries=3, autoretry_for=(Exception,), default_retry_delay=30
+)
 def run_robot_job_task(self, job_id: str) -> str:
     """
-    Task to execute a robot manufacturing job.
-
-    Sends instructions to the aligner production robot and tracks results.
+    Execute a robot manufacturing job for an aligner stage.
 
     Args:
         self: Celery task context for retrying
         job_id: ID of the robot job to execute
 
     Returns:
-        str: Final status ("completed", "queued", "failed")
+        str: Final job status ("completed" or "failed")
     """
-    # Placeholder - in production this would call the service layer
-    return "running"
+    from app.services.robot import make_sync_session, run_robot_job
+
+    session = make_sync_session()
+    try:
+        job = run_robot_job(session, job_id, simulate_delay=0.5)
+        return job.status
+    except Exception as exc:
+        raise self.retry(exc=exc)
+    finally:
+        session.close()

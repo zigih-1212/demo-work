@@ -1,23 +1,39 @@
+import re
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+
+# email-validator is an optional dependency; this pattern covers the
+# clinic-grade cases (user@domain.tld) without pulling the extra package.
+_EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 class ORMModel(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+def _validate_email(value: str) -> str:
+    if not _EMAIL_PATTERN.match(value):
+        raise ValueError("Некорректный формат email")
+    return value.lower()
+
+
 # --- Auth ---
 class RegisterRequest(BaseModel):
-    email: EmailStr
+    email: str = Field(min_length=3, max_length=255)
     full_name: str = Field(min_length=1, max_length=255)
     password: str = Field(min_length=8, max_length=128)
 
+    _check_email = field_validator("email")(_validate_email)
+
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    email: str = Field(min_length=3, max_length=255)
     password: str
+
+    _check_email = field_validator("email")(_validate_email)
 
 
 class TokenResponse(BaseModel):

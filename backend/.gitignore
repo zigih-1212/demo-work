@@ -40,10 +40,13 @@ wheels/
 *.db
 *.sqlite
 *.sqlite3
+orthodent.db
+uploads/
 
 # Logs
 *.log
 logs/
+uvicorn.log
 
 # Testing
 .coverage

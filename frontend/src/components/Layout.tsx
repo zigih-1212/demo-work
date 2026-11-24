@@ -1,49 +1,68 @@
-import { Outlet, Link, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { clearToken } from '../lib/auth'
+import { useCurrentUser } from '../lib/queries'
+
+const NAV_LINKS = [
+  { to: '/', label: 'Пациенты', end: true },
+]
 
 export default function Layout() {
-  const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
+  const { data: user } = useCurrentUser()
 
   const handleLogout = () => {
-    localStorage.removeItem('token')
-    navigate('/login')
+    clearToken()
+    navigate('/login', { replace: true })
   }
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <nav className="bg-white shadow-sm border-b border-medical-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link to="/" className="text-xl font-bold text-medical-sky-600">
-                OrthoDent
-              </Link>
-              
-              <div className="hidden md:flex ml-10 space-x-4">
-                <Link
-                  to="/"
-                  className="px-3 py-2 rounded-md text-sm font-medium text-slate-700 hover:text-medical-sky-600 hover:bg-slate-100"
+      <header className="border-b border-slate-200 bg-white shadow-sm">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-8">
+            <Link to="/" className="text-xl font-bold text-medical-sky-600">
+              OrthoDent
+            </Link>
+            <nav className="hidden gap-1 md:flex" aria-label="Основная навигация">
+              {NAV_LINKS.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  end={link.end}
+                  className={({ isActive }) =>
+                    `rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-sky-50 text-medical-sky-700'
+                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
+                    }`
+                  }
                 >
-                  Пациенты
-                </Link>
-              </div>
-            </div>
+                  {link.label}
+                </NavLink>
+              ))}
+            </nav>
+          </div>
 
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm font-medium text-medical-slate-600 hover:text-medical-slate-900 hover:bg-slate-100 rounded-md transition-colors"
-              >
-                Выход
-              </button>
-            </div>
+          <div className="flex items-center gap-4">
+            {user && (
+              <div className="hidden text-right sm:block">
+                <p className="text-sm font-medium text-slate-900">{user.full_name}</p>
+                <p className="text-xs text-slate-500">{user.email}</p>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="rounded-md px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-medical-sky-600"
+            >
+              Выход
+            </button>
           </div>
         </div>
-      </nav>
+      </header>
 
       <main className="py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <Outlet />
         </div>
       </main>

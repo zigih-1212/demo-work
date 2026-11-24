@@ -1,74 +1,79 @@
 import { Link } from 'react-router-dom'
-
-interface Patient {
-  id: string
-  full_name: string
-  birth_year: number
-  diagnosis: string
-  status: 'active' | 'completed' | 'archived'
-}
+import type { Patient } from '../types'
 
 interface PatientTableProps {
   patients: Patient[]
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  active: 'Активен',
+  completed: 'Завершён',
+  archived: 'Архив',
+}
+
+const STATUS_STYLES: Record<string, string> = {
+  active: 'bg-medical-emerald-100 text-medical-emerald-800',
+  completed: 'bg-medical-sky-100 text-medical-sky-800',
+  archived: 'bg-medical-slate-100 text-medical-slate-800',
+}
+
 export default function PatientTable({ patients }: PatientTableProps) {
-  const getStatusColor = (status: Patient['status']) => {
-    switch (status) {
-      case 'active':
-        return 'bg-medical-emerald-100 text-medical-emerald-800'
-      case 'completed':
-        return 'bg-medical-sky-100 text-medical-sky-800'
-      case 'archived':
-        return 'bg-medical-slate-100 text-medical-slate-800'
-    }
+  if (patients.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-slate-300 bg-white px-6 py-16 text-center">
+        <p className="text-base font-medium text-slate-700">Пациентов пока нет</p>
+        <p className="mt-1 text-sm text-slate-500">
+          Добавьте первого пациента, чтобы начать вести лечение.
+        </p>
+      </div>
+    )
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="overflow-hidden rounded-lg bg-white shadow-md">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-medical-slate-200">
-          <thead className="bg-medical-slate-50">
+        <table className="min-w-full divide-y divide-slate-200">
+          <thead className="bg-slate-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-medical-slate-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
                 Пациент
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-medical-slate-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
                 Год рождения
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-medical-slate-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
                 Диагноз
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-medical-slate-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-500">
                 Статус
               </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-medical-slate-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-500">
                 Действия
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-medical-slate-200">
+          <tbody className="divide-y divide-slate-200 bg-white">
             {patients.map((patient) => (
-              <tr key={patient.id} className="hover:bg-slate-50 transition-colors duration-150">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-slate-900">
-                    {patient.full_name}
-                  </div>
+              <tr key={patient.id} className="transition-colors hover:bg-slate-50">
+                <td className="whitespace-nowrap px-6 py-4">
+                  <div className="text-sm font-medium text-slate-900">{patient.full_name}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-500">
                   {patient.birth_year}
                 </td>
                 <td className="px-6 py-4 text-sm text-slate-500">
-                  {patient.diagnosis}
+                  {patient.diagnosis || <span className="text-slate-400">—</span>}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(patient.status)}`}>
-                    {patient.status === 'active' && 'Активен'}
-                    {patient.status === 'completed' && 'Завершён'}
-                    {patient.status === 'archived' && 'Архив'}
+                <td className="whitespace-nowrap px-6 py-4">
+                  <span
+                    className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
+                      STATUS_STYLES[patient.status] ?? 'bg-slate-100 text-slate-700'
+                    }`}
+                  >
+                    {STATUS_LABELS[patient.status] ?? patient.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
                   <Link
                     to={`/patients/${patient.id}`}
                     className="text-medical-sky-600 hover:text-medical-sky-900"
@@ -81,12 +86,6 @@ export default function PatientTable({ patients }: PatientTableProps) {
           </tbody>
         </table>
       </div>
-
-      {patients.length === 0 && (
-        <div className="text-center py-12 text-slate-500">
-          Нет пациентов для отображения
-        </div>
-      )}
     </div>
   )
 }

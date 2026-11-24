@@ -1,19 +1,30 @@
+"""Password hashing and JWT helpers.
+
+passlib 1.7.4 is incompatible with bcrypt>=4 (it reads bcrypt.__about__,
+removed in bcrypt 4.x), so bcrypt is used directly. The hashing scheme stays
+bcrypt, which is what passlib's CryptContext would have produced anyway.
+"""
+
 from datetime import datetime, timedelta, timezone
 
+import bcrypt
 import jwt
-from passlib.context import CryptContext
 
 from app.core.config import get_settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    """Hash a plaintext password with bcrypt (auto-generated salt)."""
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(password: str, password_hash: str) -> bool:
-    return pwd_context.verify(password, password_hash)
+    """Check a plaintext password against a stored bcrypt hash."""
+    try:
+        return bcrypt.checkpw(password.encode("utf-8"), password_hash.encode("utf-8"))
+    except ValueError:
+        # Malformed hash must never crash the auth flow.
+        return False
 
 
 def create_access_token(user_id: str, role: str) -> str:
