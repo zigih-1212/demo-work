@@ -1,0 +1,7 @@
+# Python virtual environment для backend development
+# Для создания среды выполните:
+# cd backend && python -m venv .venv
+# Для активации (Windows):
+# .venv\Scripts\activate
+# Или (Linux/Mac):
+# source .venv/bin/activate

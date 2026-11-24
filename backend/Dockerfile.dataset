@@ -1,0 +1,17 @@
+# Dockerfile for DEX Analytics Measurement (not yet applied to dataset)
+# NOTE: This is currently a reference implementation; apply when ready to commit.
+
+FROM python:3.11-slim
+
+# Install additional required libraries for measurement
+RUN pip install trimesh SimpleITK numpy opencv-python-headless
+
+WORKDIR /app
+
+COPY back/
+COPY bin/
+COPY src/
+COPY data/
+COPY run.sh .
+
+CMD ["./run.sh"]
