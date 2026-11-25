@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -19,6 +20,7 @@ export default {
             700: '#0369a1',
             800: '#075985',
             900: '#0c4a6e',
+            950: '#082f49',
           },
           emerald: {
             50: '#ecfdf5',
@@ -31,6 +33,7 @@ export default {
             700: '#047857',
             800: '#065f46',
             900: '#064e3b',
+            950: '#022c22',
           },
           amber: {
             50: '#fffbeb',
@@ -43,6 +46,7 @@ export default {
             700: '#b45309',
             800: '#92400e',
             900: '#78350f',
+            950: '#451a03',
           },
           slate: {
             50: '#f8fafc',
@@ -55,9 +59,47 @@ export default {
             700: '#334155',
             800: '#1e293b',
             900: '#0f172a',
-          }
-        }
-      }
+            950: '#020617',
+          },
+        },
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 225deg, var(--tw-gradient-stops))',
+        'medical-gradient': 'linear-gradient(135deg, #0ea5e9 0%, #10b981 100%)',
+        'medical-dark': 'linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
+      },
+      animation: {
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'spin-slow': 'spin 12s linear infinite',
+        'gradient': 'gradient 8s linear infinite',
+      },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        gradient: {
+          '0%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+          '100%': { backgroundPosition: '0% 50%' },
+        },
+      },
+      boxShadow: {
+        'medical': '0 10px 30px -10px rgba(14, 165, 233, 0.2)',
+        'medical-glow': '0 0 40px -10px rgba(14, 165, 233, 0.35)',
+        'emerald-glow': '0 0 40px -10px rgba(16, 185, 129, 0.35)',
+        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+      },
+      backdropBlur: {
+        xs: '2px',
+      },
+      borderRadius: {
+        'xl': '1rem',
+        '2xl': '1.5rem',
+        '3xl': '2rem',
+      },
     },
   },
   plugins: [],

@@ -1,14 +1,17 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { LogOut, User, LayoutDashboard, Scan, Settings, RotateCcw } from 'lucide-react'
 import { clearToken } from '../lib/auth'
-import { useCurrentUser } from '../lib/queries'
 
-const NAV_LINKS = [
-  { to: '/', label: 'Пациенты', end: true },
+const NAV_ITEMS = [
+  { to: '/', label: 'Дашборд', icon: LayoutDashboard },
+  { to: '/patients', label: 'Пациенты', icon: User },
+  { to: '/scans', label: '3D сканы', icon: Scan },
+  { to: '/production', label: 'Производство', icon: RotateCcw },
+  { to: '/settings', label: 'Настройки', icon: Settings },
 ]
 
 export default function Layout() {
   const navigate = useNavigate()
-  const { data: user } = useCurrentUser()
 
   const handleLogout = () => {
     clearToken()
@@ -16,56 +19,67 @@ export default function Layout() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white shadow-sm">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-medical-slate-950 text-slate-100 selection:bg-medical-sky-500/30">
+      <header className="border-b border-medical-slate-800/50 bg-medical-slate-950/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-8">
-            <Link to="/" className="text-xl font-bold text-medical-sky-600">
-              OrthoDent
+            <Link
+              to="/"
+              className="flex items-center gap-2 bg-medical-sky-500/10 p-2 rounded-xl border border-medical-sky-500/20 hover:border-medical-sky-400/30 transition-all group"
+            >
+              <div
+                className="w-7 h-7 rounded-lg bg-medical-sky-500 flex items-center justify-center group-hover:rotate-12 transition-transform duration-500"
+              >
+                <span className="text-[10px] font-bold text-white">O</span>
+              </div>
+              <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-medical-sky-400 to-medical-emerald-400 bg-clip-text text-transparent">
+                OrthoDent
+              </span>
             </Link>
-            <nav className="hidden gap-1 md:flex" aria-label="Основная навигация">
-              {NAV_LINKS.map((link) => (
-                <NavLink
-                  key={link.to}
-                  to={link.to}
-                  end={link.end}
-                  className={({ isActive }) =>
-                    `rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-sky-50 text-medical-sky-700'
-                        : 'text-slate-700 hover:bg-slate-100 hover:text-slate-900'
-                    }`
-                  }
-                >
-                  {link.label}
-                </NavLink>
-              ))}
+            <nav className="hidden md:flex items-center gap-1">
+              {NAV_ITEMS.map((item) => {
+                const Icon = item.icon
+                return (
+                  <NavLink
+                    key={item.to}
+                    to={item.to}
+                    end={item.to === '/'}
+                    className={({ isActive }) =>
+                      `flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                        isActive
+                          ? 'bg-medical-sky-500/10 text-medical-sky-400 border border-medical-sky-500/20'
+                          : 'text-medical-slate-400 hover:text-medical-slate-200 hover:bg-medical-slate-800/50'
+                      }`
+                    }
+                  >
+                    <Icon className="w-4 h-4" />
+                    {item.label}
+                  </NavLink>
+                )
+              })}
             </nav>
           </div>
 
           <div className="flex items-center gap-4">
-            {user && (
-              <div className="hidden text-right sm:block">
-                <p className="text-sm font-medium text-slate-900">{user.full_name}</p>
-                <p className="text-xs text-slate-500">{user.email}</p>
-              </div>
-            )}
             <button
               type="button"
               onClick={handleLogout}
-              className="rounded-md px-4 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-medical-sky-600"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-medical-slate-400 hover:text-medical-slate-200 hover:bg-medical-slate-800 transition-all border border-transparent hover:border-medical-slate-700"
             >
+              <LogOut className="w-4 h-4" />
               Выход
             </button>
           </div>
         </div>
       </header>
 
-      <main className="py-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Outlet />
-        </div>
-      </main>
+      <div className="flex flex-1 overflow-hidden">
+        <main className="flex-1 relative">
+          <div className="px-4 sm:px-6 lg:px-8 py-8">
+            <Outlet />
+          </div>
+        </main>
+      </div>
     </div>
   )
 }

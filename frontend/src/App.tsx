@@ -3,6 +3,7 @@ import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import DashboardPage from './pages/DashboardPage'
 import PatientsPage from './pages/PatientsPage'
 import PatientDetailPage from './pages/PatientDetailPage'
 import NotFoundPage from './pages/NotFoundPage'
@@ -20,7 +21,8 @@ function App() {
           </ProtectedRoute>
         }
       >
-        <Route index element={<PatientsPage />} />
+        <Route index element={<DashboardPage />} />
+        <Route path="patients" element={<PatientsPage />} />
         <Route path="patients/:id" element={<PatientDetailPage />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />
