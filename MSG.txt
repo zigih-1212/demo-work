@@ -1,0 +1,7 @@
+fix(ui): human-readable patient status and mobile stage layout
+
+- Patient status rendered the raw enum ("active"); now shows the Russian
+  label like every other status badge.
+- Stage rows stack vertically below the sm breakpoint so long descriptions
+  no longer collide with the status badge on phones.
+- Verified visually in the browser at 1440x900, 1024x768 and 390x844.

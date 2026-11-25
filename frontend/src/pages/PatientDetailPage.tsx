@@ -18,6 +18,12 @@ const STAGE_STATUS_LABELS: Record<string, string> = {
   done: 'Завершён',
 }
 
+const PATIENT_STATUS_LABELS: Record<string, string> = {
+  active: 'Активен',
+  completed: 'Завершён',
+  archived: 'Архив',
+}
+
 const STAGE_STATUS_STYLES: Record<string, string> = {
   planned: 'bg-slate-100 text-slate-800',
   in_production: 'bg-amber-100 text-amber-800',
@@ -188,7 +194,9 @@ export default function PatientDetailPage() {
             </div>
             <div>
               <dt className="text-sm font-medium text-slate-500">Статус лечения</dt>
-              <dd className="text-base text-slate-900">{patient.status}</dd>
+              <dd className="text-base text-slate-900">
+                {PATIENT_STATUS_LABELS[patient.status] ?? patient.status}
+              </dd>
             </div>
           </dl>
         </section>
@@ -293,12 +301,12 @@ export default function PatientDetailPage() {
           {stages.map((stage) => (
             <li
               key={stage.id}
-              className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-slate-200 bg-slate-50 p-4"
+              className="flex flex-col gap-3 rounded-md border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-3">
+                <div className="flex items-start gap-3">
                   <span className="text-sm font-bold text-medical-sky-600">#{stage.position}</span>
-                  <p className="text-sm font-medium text-slate-900">
+                  <p className="min-w-0 break-words text-sm font-medium text-slate-900">
                     {stage.description || 'Без описания'}
                   </p>
                 </div>
@@ -307,7 +315,7 @@ export default function PatientDetailPage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <span
                   className={`rounded-full px-3 py-1 text-sm font-semibold ${
                     STAGE_STATUS_STYLES[stage.status] ?? 'bg-slate-100 text-slate-700'

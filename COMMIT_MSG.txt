@@ -1,9 +1,0 @@
-feat: wire frontend to real API, fix backend startup and bcrypt
-
-- Frontend now calls the real FastAPI API (axios client, react-query hooks)
-  instead of mock data; added auth token storage, route guard, 404 page,
-  SPA _redirects for Cloudflare Pages.
-- Backend: created missing app/main.py (FastAPI entrypoint, CORS, routers),
-  regex email validation (email-validator unavailable offline), direct bcrypt
-  usage (passlib 1.7.4 incompatible with bcrypt 4.x), robust debug bool parsing.
-- Added backend smoke tests (smoke_test.py, run_all.py): 22/22 passing.
