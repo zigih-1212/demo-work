@@ -1,7 +1,31 @@
-# Деплой frontend на Cloudflare Pages
+# Деплой frontend на Cloudflare
 
 Репозиторий уже готов и запушен: <https://github.com/zigih-1212/demo-work>
 (ветка `main`, frontend в каталоге `frontend/`, production-сборка проверена локально).
+
+## Текущий деплой (Cloudflare Worker)
+
+Сайт: <https://demo-work.dvybornyh332.workers.dev>
+Worker `demo-work` отдаёт статику из `frontend/dist`; SPA-фолбэк включён через
+`frontend/wrangler.toml` (`not_found_handling = "single-page-application"`).
+Файл `_redirects` для Worker не нужен и вызывает ошибку «infinite loop».
+
+Обновление сайта после изменений:
+
+```powershell
+cd frontend
+npm run build
+$env:HTTPS_PROXY="http://127.0.0.1:10809"   # если нужен прокси
+npx wrangler deploy
+```
+
+> В этом окружении wrangler 4 не проходит через локальный прокси; рабочий
+> вариант — wrangler 3 (`npm i wrangler@3 --prefix C:\opencode\w3`) либо запуск
+> с машины без прокси.
+
+---
+
+## Вариант: Cloudflare Pages
 
 Ниже — три способа. Выберите один.
 
